@@ -1,0 +1,65 @@
+// Based on authboss-sample
+
+package auth
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/sessions"
+
+	"gopkg.in/authboss.v0"
+)
+
+// TODO: should sessionStore or cookieStore be global?
+type SessionStorer struct {
+	w http.ResponseWriter
+	r *http.Request
+  sessionStore *sessions.CookieStore
+}
+
+func NewSessionStorer(w http.ResponseWriter, r *http.Request) authboss.ClientStorer {
+	return &SessionStorer{w, r, sessions.NewCookieStore(sessionStoreKey)}
+}
+
+func (s SessionStorer) Get(key string) (string, bool) {
+	session, err := s.sessionStore.Get(s.r, sessionCookieName)
+	if err != nil {
+		fmt.Println(err)
+		return "", false
+	}
+
+	strInf, ok := session.Values[key]
+	if !ok {
+		return "", false
+	}
+
+	str, ok := strInf.(string)
+	if !ok {
+		return "", false
+	}
+
+	return str, true
+}
+
+func (s SessionStorer) Put(key, value string) {
+	session, err := s.sessionStore.Get(s.r, sessionCookieName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	session.Values[key] = value
+	session.Save(s.r, s.w)
+}
+
+func (s SessionStorer) Del(key string) {
+	session, err := s.sessionStore.Get(s.r, sessionCookieName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	delete(session.Values, key)
+	session.Save(s.r, s.w)
+}
