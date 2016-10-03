@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <form method="POST">
+      <p>User: <input type="text" name="{{.primaryID}}" value="{{.primaryIDValue}}" /></p>
+      <p>Password: <input type="password" name="password" /></p>
+      <p><input type="submit" value="Submit" />
+      <input type="hidden" name="{{.xsrfName}}" value="{{.xsrfToken}}" />
+    </form>
+  </body>
+</html>

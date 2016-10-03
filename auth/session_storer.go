@@ -11,19 +11,22 @@ import (
 	"gopkg.in/authboss.v0"
 )
 
-// TODO: should sessionStore or cookieStore be global?
+var sessionStore *sessions.CookieStore
+
 type SessionStorer struct {
 	w http.ResponseWriter
 	r *http.Request
-  sessionStore *sessions.CookieStore
 }
 
 func NewSessionStorer(w http.ResponseWriter, r *http.Request) authboss.ClientStorer {
-	return &SessionStorer{w, r, sessions.NewCookieStore(sessionStoreKey)}
+  if sessionStore == nil {
+    sessionStore = sessions.NewCookieStore(sessionStoreKey)
+  }
+	return &SessionStorer{w, r}
 }
 
 func (s SessionStorer) Get(key string) (string, bool) {
-	session, err := s.sessionStore.Get(s.r, sessionCookieName)
+	session, err := sessionStore.Get(s.r, sessionCookieName)
 	if err != nil {
 		fmt.Println(err)
 		return "", false
@@ -43,7 +46,7 @@ func (s SessionStorer) Get(key string) (string, bool) {
 }
 
 func (s SessionStorer) Put(key, value string) {
-	session, err := s.sessionStore.Get(s.r, sessionCookieName)
+	session, err := sessionStore.Get(s.r, sessionCookieName)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -54,7 +57,7 @@ func (s SessionStorer) Put(key, value string) {
 }
 
 func (s SessionStorer) Del(key string) {
-	session, err := s.sessionStore.Get(s.r, sessionCookieName)
+	session, err := sessionStore.Get(s.r, sessionCookieName)
 	if err != nil {
 		fmt.Println(err)
 		return

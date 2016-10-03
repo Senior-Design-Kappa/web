@@ -2,7 +2,7 @@ package router
 
 import (
 	"fmt"
-  "html/template"
+  // "html/template"
 	"net/http"
 	"time"
 
@@ -23,7 +23,7 @@ func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	r := mux.NewRouter()
   gets := r.Methods("GET").Subrouter()
 
-  gets.HandleFunc("/", LoginHandler)
+  gets.HandleFunc("/", HomeHandler)
 	gets.HandleFunc("/health", auth.DoAuth(health))
 
   auth.AddMountPath(r)
@@ -47,7 +47,8 @@ func health(w http.ResponseWriter, r *http.Request) {
   fmt.Fprintf(w, "OK")
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-  t, _ := template.ParseFiles("templates/login.html.tpl")
-  t.Execute(w, nil)
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, "Home")
+  // t, _ := template.ParseFiles("templates/login.html.tpl")
+  // t.Execute(w, nil)
 }

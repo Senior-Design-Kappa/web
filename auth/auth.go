@@ -9,6 +9,8 @@ import (
 	"github.com/justinas/nosurf"
 
   "gopkg.in/authboss.v0"
+  _ "gopkg.in/authboss.v0/auth"
+  _ "gopkg.in/authboss.v0/register"
 )
 
 type Auth struct {
@@ -45,7 +47,7 @@ func (a Auth) CreateRouter(r *mux.Router) http.Handler {
 
 func setupAuthboss() *authboss.Authboss {
   ab := authboss.New()
-  ab.Storer = NewMemStorer()
+  ab.Storer = NewDbUserStorer()
   ab.CookieStoreMaker = NewCookieStorer
   ab.SessionStoreMaker = NewSessionStorer
   ab.XSRFName = xsrfName
@@ -53,6 +55,7 @@ func setupAuthboss() *authboss.Authboss {
     return nosurf.Token(r)
   }
   ab.MountPath = "/auth"
+  ab.ViewsPath = "./templates"
   if err := ab.Init(); err != nil {
     log.Fatal(err)
   }

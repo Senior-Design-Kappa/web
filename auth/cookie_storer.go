@@ -12,14 +12,18 @@ import (
   "gopkg.in/authboss.v0"
 )
 
+var cookieStore *securecookie.SecureCookie
+
 type CookieStorer struct {
 	w http.ResponseWriter
 	r *http.Request
-  cookieStore *securecookie.SecureCookie
 }
 
 func NewCookieStorer(w http.ResponseWriter, r *http.Request) authboss.ClientStorer {
-  return &CookieStorer {w, r, securecookie.New(cookieStoreKey, nil)}
+  if cookieStore == nil {
+    cookieStore = securecookie.New(cookieStoreKey, nil)
+  }
+  return &CookieStorer {w, r}
 }
 
 func (s CookieStorer) Get(key string) (string, bool) {
@@ -29,7 +33,7 @@ func (s CookieStorer) Get(key string) (string, bool) {
 	}
 
 	var value string
-	err = s.cookieStore.Decode(key, cookie.Value, &value)
+	err = cookieStore.Decode(key, cookie.Value, &value)
 	if err != nil {
 		return "", false
 	}
@@ -38,7 +42,7 @@ func (s CookieStorer) Get(key string) (string, bool) {
 }
 
 func (s CookieStorer) Put(key, value string) {
-	encoded, err := s.cookieStore.Encode(key, value)
+	encoded, err := cookieStore.Encode(key, value)
 	if err != nil {
 		fmt.Println(err)
 	}
