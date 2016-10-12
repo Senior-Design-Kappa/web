@@ -2,8 +2,10 @@ package router
 
 import (
 	"fmt"
-  // "html/template"
+  "html/template"
 	"net/http"
+  "os"
+  "strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -19,13 +21,23 @@ type Server struct {
 	Config config.Config
 }
 
-func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
-	r := mux.NewRouter()
-  gets := r.Methods("GET").Subrouter()
+var clientPath = ""
 
+func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
+  clientPath = os.Getenv("CLIENT_PATH")
+	r := mux.NewRouter()
+
+  // GET request handlers
+  gets := r.Methods("GET").Subrouter()
   gets.HandleFunc("/", HomeHandler)
 	gets.HandleFunc("/health", auth.DoAuth(health))
+	gets.HandleFunc("/room/{id}/", auth.DoAuth(RoomHandler))
 
+  // Static handlers
+  gets.PathPrefix("/css/").Handler(http.FileServer(http.Dir(clientPath + "css/")))
+  gets.PathPrefix("/js/").Handler(http.FileServer(http.Dir(clientPath + "js/")))
+
+  // Auth stuff
   auth.AddMountPath(r)
   stack := auth.CreateRouter(r)
 
@@ -48,7 +60,30 @@ func health(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "Home")
-  // t, _ := template.ParseFiles("templates/login.html.tpl")
-  // t.Execute(w, nil)
+  t, err := template.ParseFiles(clientPath + "templates/index.html.tpl")
+  if err != nil {
+    fmt.Fprintf(w, "Could not find template!")
+    return
+  }
+  fmt.Printf("%s\n", clientPath + "templates/index.html.tpl")
+  t.Execute(w, nil)
+}
+
+func RoomHandler(w http.ResponseWriter, r *http.Request) {
+  roomId, err := strconv.Atoi(mux.Vars(r)["id"])
+  if err != nil {
+    fmt.Fprintf(w, "Invalid room ID!")
+    return
+  }
+  t, err := template.ParseFiles(clientPath + "templates/room.html.tpl")
+  if err != nil {
+    fmt.Fprintf(w, "Could not find template!")
+    return
+  }
+  data := struct {
+    id int
+  } {
+    roomId,
+  }
+  t.Execute(w, data)
 }
