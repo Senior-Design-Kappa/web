@@ -37,11 +37,13 @@ func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	gets := r.Methods("GET").Subrouter()
 	gets.HandleFunc("/", HomeHandler)
 	gets.HandleFunc("/health", auth.DoAuth(health))
-	gets.HandleFunc("/room/{id}/", RoomHandler)
+	gets.HandleFunc("/room/{id}", RoomHandler)
 
 	// Static handlers
 	gets.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(clientPath+"css/"))))
 	gets.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(clientPath+"js/"))))
+	gets.PathPrefix("/room/js/").Handler(http.StripPrefix("/room/js/", http.FileServer(http.Dir(clientPath+"js/"))))
+	gets.PathPrefix("/room/css/").Handler(http.StripPrefix("/room/css/", http.FileServer(http.Dir(clientPath+"css/"))))
 
 	// Auth stuff
 	auth.AddMountPath(r)
@@ -81,11 +83,13 @@ func RoomHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Invalid room ID!")
 		return
 	}
-	t, err := template.ParseFiles(clientPath + "templates/room.html.tpl")
+	t, err := template.ParseFiles(clientPath + "templates/room.html")
 	if err != nil {
 		fmt.Fprintf(w, "Could not find template!")
 		return
 	}
+	fmt.Printf("%s RoomID: %d\n", clientPath+"templates/room.html", roomId)
+
 	data := struct {
 		Id int
 	}{
