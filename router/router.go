@@ -25,17 +25,20 @@ var clientPath = ""
 
 func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
   clientPath = os.Getenv("CLIENT_PATH")
+  if clientPath == "" {
+    clientPath = "./"
+  }
 	r := mux.NewRouter()
 
   // GET request handlers
   gets := r.Methods("GET").Subrouter()
   gets.HandleFunc("/", HomeHandler)
 	gets.HandleFunc("/health", auth.DoAuth(health))
-	gets.HandleFunc("/room/{id}/", auth.DoAuth(RoomHandler))
+	gets.HandleFunc("/room/{id}/", RoomHandler)
 
   // Static handlers
-  gets.PathPrefix("/css/").Handler(http.FileServer(http.Dir(clientPath + "css/")))
-  gets.PathPrefix("/js/").Handler(http.FileServer(http.Dir(clientPath + "js/")))
+  gets.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(clientPath + "css/"))))
+  gets.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(clientPath + "js/"))))
 
   // Auth stuff
   auth.AddMountPath(r)
@@ -81,7 +84,7 @@ func RoomHandler(w http.ResponseWriter, r *http.Request) {
     return
   }
   data := struct {
-    id int
+    Id int
   } {
     roomId,
   }
