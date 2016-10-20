@@ -8,7 +8,7 @@ type Config struct {
 
 func NewConfig() Config {
 	c := Config{
-		Addr: os.Getenv("SERVER_ADDRESS") + ":8080",
+		Addr: os.Getenv("SERVER_ADDRESS") + ":8000",
 	}
 	return c
 }
