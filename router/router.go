@@ -2,10 +2,10 @@ package router
 
 import (
 	"fmt"
-  "html/template"
+	"html/template"
 	"net/http"
-  "os"
-  "strconv"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -21,28 +21,33 @@ type Server struct {
 	Config config.Config
 }
 
-var clientPath = ""
+var (
+	clientPath       = ""
+	clientFileServer http.Handler
+)
 
 func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
-  clientPath = os.Getenv("CLIENT_PATH")
-  if clientPath == "" {
-    clientPath = "./"
-  }
+	clientPath = os.Getenv("CLIENT_PATH")
+	if clientPath == "" {
+		clientPath = "./"
+	}
 	r := mux.NewRouter()
 
-  // GET request handlers
-  gets := r.Methods("GET").Subrouter()
-  gets.HandleFunc("/", HomeHandler)
+	// GET request handlers
+	gets := r.Methods("GET").Subrouter()
+	gets.HandleFunc("/", HomeHandler)
 	gets.HandleFunc("/health", auth.DoAuth(health))
-	gets.HandleFunc("/room/{id}/", RoomHandler)
+	gets.HandleFunc("/room/{id}", RoomHandler)
 
-  // Static handlers
-  gets.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(clientPath + "css/"))))
-  gets.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(clientPath + "js/"))))
+	// Static handlers
+	gets.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(clientPath+"css/"))))
+	gets.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(clientPath+"js/"))))
+	gets.PathPrefix("/room/js/").Handler(http.StripPrefix("/room/js/", http.FileServer(http.Dir(clientPath+"js/"))))
+	gets.PathPrefix("/room/css/").Handler(http.StripPrefix("/room/css/", http.FileServer(http.Dir(clientPath+"css/"))))
 
-  // Auth stuff
-  auth.AddMountPath(r)
-  stack := auth.CreateRouter(r)
+	// Auth stuff
+	auth.AddMountPath(r)
+	stack := auth.CreateRouter(r)
 
 	s := &Server{
 		Server: &http.Server{
@@ -59,34 +64,36 @@ func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 }
 
 func health(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "OK")
+	fmt.Fprintf(w, "OK")
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-  t, err := template.ParseFiles(clientPath + "templates/index.html.tpl")
-  if err != nil {
-    fmt.Fprintf(w, "Could not find template!")
-    return
-  }
-  fmt.Printf("%s\n", clientPath + "templates/index.html.tpl")
-  t.Execute(w, nil)
+	t, err := template.ParseFiles(clientPath + "templates/index.html")
+	if err != nil {
+		fmt.Fprintf(w, "Could not find template!")
+		return
+	}
+	fmt.Printf("%s\n", clientPath+"templates/index.html")
+	t.Execute(w, nil)
 }
 
 func RoomHandler(w http.ResponseWriter, r *http.Request) {
-  roomId, err := strconv.Atoi(mux.Vars(r)["id"])
-  if err != nil {
-    fmt.Fprintf(w, "Invalid room ID!")
-    return
-  }
-  t, err := template.ParseFiles(clientPath + "templates/room.html.tpl")
-  if err != nil {
-    fmt.Fprintf(w, "Could not find template!")
-    return
-  }
-  data := struct {
-    Id int
-  } {
-    roomId,
-  }
-  t.Execute(w, data)
+	roomId, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		fmt.Fprintf(w, "Invalid room ID!")
+		return
+	}
+	t, err := template.ParseFiles(clientPath + "templates/room.html")
+	if err != nil {
+		fmt.Fprintf(w, "Could not find template!")
+		return
+	}
+	fmt.Printf("%s RoomID: %d\n", clientPath+"templates/room.html", roomId)
+
+	data := struct {
+		Id int
+	}{
+		roomId,
+	}
+	t.Execute(w, data)
 }
