@@ -1,0 +1,81 @@
+{
+	"ImportPath": "github.com/Senior-Design-Kappa/web",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Comment": "v1.1-4-gaed02d1",
+			"Rev": "aed02d124ae4a0e94fea4541c8effd05bf0c8296"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.1-20-g7804150",
+			"Rev": "780415097119f6f61c55475fe59b66f3c3e9ea53"
+		},
+		{
+			"ImportPath": "github.com/gorilla/securecookie",
+			"Comment": "v1.1-5-gfa5329f",
+			"Rev": "fa5329f913702981df43dcb2a380bac429c810b5"
+		},
+		{
+			"ImportPath": "github.com/gorilla/sessions",
+			"Comment": "v1.1",
+			"Rev": "ca9ada44574153444b00d3fd9c8559e4cc95f896"
+		},
+		{
+			"ImportPath": "github.com/justinas/alice",
+			"Comment": "1.0.0-16-g1051eaf",
+			"Rev": "1051eaf52fcafdd87ead59d28b065f1fcb8274ec"
+		},
+		{
+			"ImportPath": "github.com/justinas/nosurf",
+			"Comment": "0.1-68-g8e15682",
+			"Rev": "8e15682772641a1e39c431233e6a9338a32def32"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-sqlite3",
+			"Comment": "v1.1.0-76-gc3e9588",
+			"Rev": "c3e9588849195eefa783417c3a53d092f6e93526"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "9e9c7d4ed3e28836a0741f74011e308570bec743"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "9e9c7d4ed3e28836a0741f74011e308570bec743"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "075e191f18186a8ff2becaf64478e30f4545cdad"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "1e695b1c8febf17aad3bfa7bf0a819ef94b98ad5"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "1e695b1c8febf17aad3bfa7bf0a819ef94b98ad5"
+		},
+		{
+			"ImportPath": "gopkg.in/authboss.v0",
+			"Rev": "4835af15f957562532784623cf8caa8c8620e64b"
+		},
+		{
+			"ImportPath": "gopkg.in/authboss.v0/auth",
+			"Rev": "4835af15f957562532784623cf8caa8c8620e64b"
+		},
+		{
+			"ImportPath": "gopkg.in/authboss.v0/internal/response",
+			"Rev": "4835af15f957562532784623cf8caa8c8620e64b"
+		},
+		{
+			"ImportPath": "gopkg.in/authboss.v0/register",
+			"Rev": "4835af15f957562532784623cf8caa8c8620e64b"
+		}
+	]
+}
