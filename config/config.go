@@ -6,7 +6,7 @@ type Config struct {
 
 func NewConfig() Config {
 	c := Config{
-		Addr: "localhost:8000",
+		Addr: "localhost:8080",
 	}
 	return c
 }
