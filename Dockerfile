@@ -3,7 +3,8 @@ FROM golang:1.7.3-alpine
 RUN apk add --update git gcc musl-dev
 
 RUN export GOPATH=$HOME
-RUN export SERVER_ADDRESS="159.203.88.91"
+
+ENV CLIENT_PATH="/go/src/github.com/Senior-Design-Kappa/web-client/"
 
 ADD . /go/src/github.com/Senior-Design-Kappa/web
 
