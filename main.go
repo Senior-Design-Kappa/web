@@ -11,7 +11,9 @@ import (
 )
 
 func main() {
-	conf := config.NewConfig()
+	conf := config.NewDefaultConfig()
+  conf.UpdateFromEnvironment()
+
 	b := makeBackend(conf)
 	l := makeLogic(conf, b)
   a := makeAuth()
