@@ -19,9 +19,9 @@ type SessionStorer struct {
 }
 
 func NewSessionStorer(w http.ResponseWriter, r *http.Request) authboss.ClientStorer {
-  if sessionStore == nil {
-    sessionStore = sessions.NewCookieStore(sessionStoreKey)
-  }
+	if sessionStore == nil {
+		sessionStore = sessions.NewCookieStore(sessionStoreKey)
+	}
 	return &SessionStorer{w, r}
 }
 

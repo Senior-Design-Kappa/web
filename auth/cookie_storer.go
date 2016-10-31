@@ -3,13 +3,13 @@
 package auth
 
 import (
-  "fmt"
+	"fmt"
 	"net/http"
 	"time"
 
-  "github.com/gorilla/securecookie"
+	"github.com/gorilla/securecookie"
 
-  "gopkg.in/authboss.v0"
+	"gopkg.in/authboss.v0"
 )
 
 var cookieStore *securecookie.SecureCookie
@@ -20,14 +20,14 @@ type CookieStorer struct {
 }
 
 func NewCookieStorer(w http.ResponseWriter, r *http.Request) authboss.ClientStorer {
-  if cookieStore == nil {
-    cookieStore = securecookie.New(cookieStoreKey, nil)
-  }
-  return &CookieStorer {w, r}
+	if cookieStore == nil {
+		cookieStore = securecookie.New(cookieStoreKey, nil)
+	}
+	return &CookieStorer{w, r}
 }
 
 func (s CookieStorer) Get(key string) (string, bool) {
-  cookie, err := s.r.Cookie(key)
+	cookie, err := s.r.Cookie(key)
 	if err != nil {
 		return "", false
 	}

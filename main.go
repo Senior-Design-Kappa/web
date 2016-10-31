@@ -12,21 +12,21 @@ import (
 
 func main() {
 	conf := config.NewDefaultConfig()
-  conf.UpdateFromEnvironment()
+	conf.UpdateFromEnvironment()
 
 	b := makeBackend(conf)
 	l := makeLogic(conf, b)
-  a := makeAuth()
+	a := makeAuth()
 	s := router.NewServer(conf, l, a)
 	log.Fatal(s.ListenAndServe())
 }
 
 func makeAuth() auth.Auth {
-  a, err := auth.NewAuth()
-  if err != nil {
-    log.Fatalf("error: auth layer could not be created (%+v)\n", err)
-  }
-  return a
+	a, err := auth.NewAuth()
+	if err != nil {
+		log.Fatalf("error: auth layer could not be created (%+v)\n", err)
+	}
+	return a
 }
 
 func makeBackend(conf config.Config) backend.Backend {

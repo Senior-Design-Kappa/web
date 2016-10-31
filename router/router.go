@@ -24,7 +24,7 @@ var serverConf *config.Config
 
 func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	r := mux.NewRouter()
-  serverConf = &conf
+	serverConf = &conf
 
 	// GET request handlers
 	gets := r.Methods("GET").Subrouter()
@@ -60,19 +60,19 @@ func health(w http.ResponseWriter, r *http.Request) {
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles(
-    serverConf.ClientPath + "templates/index.html",
-    serverConf.ClientPath + "templates/header.html",
-    serverConf.ClientPath + "templates/footer.html",
-  )
+		serverConf.ClientPath+"templates/index.html",
+		serverConf.ClientPath+"templates/header.html",
+		serverConf.ClientPath+"templates/footer.html",
+	)
 	if err != nil {
 		fmt.Fprintf(w, "Error with template! (%s)", err)
 		return
 	}
-  data := struct {
-    Title string
-  }{
-    "Kappa",
-  }
+	data := struct {
+		Title string
+	}{
+		"Kappa",
+	}
 	t.Execute(w, data)
 }
 
@@ -83,23 +83,23 @@ func RoomHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	t, err := template.ParseFiles(
-    serverConf.ClientPath + "templates/room.html",
-    serverConf.ClientPath + "templates/header.html",
-    serverConf.ClientPath + "templates/footer.html",
-  )
+		serverConf.ClientPath+"templates/room.html",
+		serverConf.ClientPath+"templates/header.html",
+		serverConf.ClientPath+"templates/footer.html",
+	)
 	if err != nil {
 		fmt.Fprintf(w, "Error with template! (%s)", err)
 		return
 	}
 
 	data := struct {
-    WebsocketAddr string
-		RoomId int
-    Title string
+		WebsocketAddr string
+		RoomId        int
+		Title         string
 	}{
-    "ws://" + serverConf.SyncAddr + "/connect/",
+		"ws://" + serverConf.SyncAddr + "/connect/",
 		roomId,
-    "Room " + strconv.Itoa(roomId),
+		"Room " + strconv.Itoa(roomId),
 	}
 	t.Execute(w, data)
 }
