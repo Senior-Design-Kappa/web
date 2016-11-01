@@ -1,6 +1,7 @@
 package auth
 
 import (
+  "html/template"
 	"log"
 	"net/http"
 
@@ -11,14 +12,16 @@ import (
 	"gopkg.in/authboss.v0"
 	_ "gopkg.in/authboss.v0/auth"
 	_ "gopkg.in/authboss.v0/register"
+
+	"github.com/Senior-Design-Kappa/web/config"
 )
 
 type Auth struct {
 	ab *authboss.Authboss
 }
 
-func NewAuth() (Auth, error) {
-	ab := setupAuthboss()
+func NewAuth(conf config.Config) (Auth, error) {
+	ab := setupAuthboss(conf)
 	a := Auth{
 		ab: ab,
 	}
@@ -60,7 +63,7 @@ func (a Auth) CurrentUser(w http.ResponseWriter, r *http.Request) string {
   }
 }
 
-func setupAuthboss() *authboss.Authboss {
+func setupAuthboss(conf config.Config) *authboss.Authboss {
 	ab := authboss.New()
 	ab.Storer = NewDbUserStorer()
 	ab.CookieStoreMaker = NewCookieStorer
@@ -70,7 +73,12 @@ func setupAuthboss() *authboss.Authboss {
 		return nosurf.Token(r)
 	}
 	ab.MountPath = "/auth"
-	ab.ViewsPath = "./templates"
+	ab.ViewsPath = conf.ClientPath + "templates/auth"
+  ab.Layout = template.Must(template.ParseFiles(
+    ab.ViewsPath + "/layout.html.tpl",
+    conf.ClientPath + "templates/header.html",
+    conf.ClientPath + "templates/footer.html",
+  ))
 	if err := ab.Init(); err != nil {
 		log.Fatal(err)
 	}

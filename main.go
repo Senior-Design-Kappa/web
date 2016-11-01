@@ -16,13 +16,13 @@ func main() {
 
 	b := makeBackend(conf)
 	l := makeLogic(conf, b)
-	a := makeAuth()
+	a := makeAuth(conf)
 	s := router.NewServer(conf, l, a)
 	log.Fatal(s.ListenAndServe())
 }
 
-func makeAuth() auth.Auth {
-	a, err := auth.NewAuth()
+func makeAuth(conf config.Config) auth.Auth {
+	a, err := auth.NewAuth(conf)
 	if err != nil {
 		log.Fatalf("error: auth layer could not be created (%+v)\n", err)
 	}
