@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/Senior-Design-Kappa/web/config"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Backend interface {

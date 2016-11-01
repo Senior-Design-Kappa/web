@@ -24,7 +24,7 @@ var serverConf *config.Config
 
 func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	r := mux.NewRouter()
-  serverConf = &conf
+	serverConf = &conf
 
 	// GET request handlers
 	gets := r.Methods("GET").Subrouter()
@@ -35,8 +35,6 @@ func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	// Static handlers
 	gets.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(conf.ClientPath+"css/"))))
 	gets.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(conf.ClientPath+"js/"))))
-	gets.PathPrefix("/room/js/").Handler(http.StripPrefix("/room/js/", http.FileServer(http.Dir(conf.ClientPath+"js/"))))
-	gets.PathPrefix("/room/css/").Handler(http.StripPrefix("/room/css/", http.FileServer(http.Dir(conf.ClientPath+"css/"))))
 
 	// Auth stuff
 	auth.AddMountPath(r)
@@ -61,13 +59,21 @@ func health(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles(serverConf.ClientPath + "templates/index.html")
+	t, err := template.ParseFiles(
+		serverConf.ClientPath+"templates/index.html",
+		serverConf.ClientPath+"templates/header.html",
+		serverConf.ClientPath+"templates/footer.html",
+	)
 	if err != nil {
-		fmt.Fprintf(w, "Could not find template!")
+		fmt.Fprintf(w, "Error with template! (%s)", err)
 		return
 	}
-	fmt.Printf("%s\n", serverConf.ClientPath+"templates/index.html")
-	t.Execute(w, nil)
+	data := struct {
+		Title string
+	}{
+		"Kappa",
+	}
+	t.Execute(w, data)
 }
 
 func RoomHandler(w http.ResponseWriter, r *http.Request) {
@@ -76,19 +82,24 @@ func RoomHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Invalid room ID!")
 		return
 	}
-	t, err := template.ParseFiles(serverConf.ClientPath + "templates/room.html")
+	t, err := template.ParseFiles(
+		serverConf.ClientPath+"templates/room.html",
+		serverConf.ClientPath+"templates/header.html",
+		serverConf.ClientPath+"templates/footer.html",
+	)
 	if err != nil {
-		fmt.Fprintf(w, "Could not find template!")
+		fmt.Fprintf(w, "Error with template! (%s)", err)
 		return
 	}
-	fmt.Printf("%s RoomID: %d\n", serverConf.ClientPath+"templates/room.html", roomId)
 
 	data := struct {
-    WebsocketAddr string
-		RoomId int
+		WebsocketAddr string
+		RoomId        int
+		Title         string
 	}{
-    "ws://" + serverConf.SyncAddr + "/connect/",
+		"ws://" + serverConf.SyncAddr + "/connect/",
 		roomId,
+		"Room " + strconv.Itoa(roomId),
 	}
 	t.Execute(w, data)
 }
