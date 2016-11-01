@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,10 +20,12 @@ type Server struct {
 }
 
 var serverConf *config.Config
+var serverAuth *auth.Auth
 
 func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	r := mux.NewRouter()
 	serverConf = &conf
+  serverAuth = &auth
 
 	// GET request handlers
 	gets := r.Methods("GET").Subrouter()
@@ -59,47 +60,24 @@ func health(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles(
-		serverConf.ClientPath+"templates/index.html",
-		serverConf.ClientPath+"templates/header.html",
-		serverConf.ClientPath+"templates/footer.html",
-	)
-	if err != nil {
-		fmt.Fprintf(w, "Error with template! (%s)", err)
-		return
-	}
-	data := struct {
-		Title string
-	}{
-		"Kappa",
-	}
-	t.Execute(w, data)
+	data := map[string]string {
+    "Title": "Kappa",
+  }
+  RenderHeaderFooterTemplate(w, r, data, "templates/index.html")
 }
 
 func RoomHandler(w http.ResponseWriter, r *http.Request) {
-	roomId, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		fmt.Fprintf(w, "Invalid room ID!")
-		return
-	}
-	t, err := template.ParseFiles(
-		serverConf.ClientPath+"templates/room.html",
-		serverConf.ClientPath+"templates/header.html",
-		serverConf.ClientPath+"templates/footer.html",
-	)
-	if err != nil {
-		fmt.Fprintf(w, "Error with template! (%s)", err)
-		return
-	}
+  roomId := mux.Vars(r)["id"]
+  _, err := strconv.Atoi(roomId)
+  if err != nil {
+    fmt.Fprintf(w, "Invalid room ID! (%s)", err)
+    return
+  }
 
-	data := struct {
-		WebsocketAddr string
-		RoomId        int
-		Title         string
-	}{
-		"ws://" + serverConf.SyncAddr + "/connect/",
-		roomId,
-		"Room " + strconv.Itoa(roomId),
-	}
-	t.Execute(w, data)
+	data := map[string]string {
+    "WebsocketAddr": "ws://" + serverConf.SyncAddr + "/connect/",
+    "RoomId": roomId,
+    "Title": "Room " + roomId,
+  }
+  RenderHeaderFooterTemplate(w, r, data, "templates/room.html")
 }

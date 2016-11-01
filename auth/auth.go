@@ -45,6 +45,21 @@ func (a Auth) CreateRouter(r *mux.Router) http.Handler {
 	return alice.New(nosurfing, a.ab.ExpireMiddleware).Then(r)
 }
 
+// returns username, or "" if not logged in
+func (a Auth) CurrentUser(w http.ResponseWriter, r *http.Request) string {
+  user, err := a.ab.CurrentUser(w, r)
+  if user == nil {
+    if err == nil || err == authboss.ErrUserNotFound {
+      return ""
+    } else {
+      log.Printf("Error getting current user! (%s)", err)
+      return ""
+    }
+  } else {
+    return user.(User).Name
+  }
+}
+
 func setupAuthboss() *authboss.Authboss {
 	ab := authboss.New()
 	ab.Storer = NewDbUserStorer()
