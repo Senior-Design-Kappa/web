@@ -36,6 +36,7 @@ func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	// Static handlers
 	gets.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir(conf.ClientPath+"css/"))))
 	gets.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir(conf.ClientPath+"js/"))))
+	gets.PathPrefix("/imgs/").Handler(http.StripPrefix("/imgs/", http.FileServer(http.Dir(conf.ClientPath+"imgs/"))))
 
 	// Auth stuff
 	auth.AddMountPath(r)
