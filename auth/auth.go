@@ -2,7 +2,6 @@ package auth
 
 import (
 	"database/sql"
-	"html/template"
 	"log"
 	"net/http"
 
@@ -14,29 +13,33 @@ import (
 )
 
 type Auth struct {
-	db        *sql.DB
-	MountPath string
+	db          *sql.DB
+	MountPath   string
+	TokenSecret []byte
 }
 
-func NewAuth(conf config.Config) (Auth, error) {
+func NewAuth(conf config.Config) (*Auth, error) {
 	db, err := sql.Open("sqlite3", "./db/users.db")
 	if err != nil {
 		log.Printf("error: could not open db connection (%+v)\n", err)
 		return nil, err
 	}
-	a := Auth{
-		db:        db,
-		MountPath: "/auth/",
+	// TODO: change token
+	a := &Auth{
+		db:          db,
+		MountPath:   "/auth/",
+		TokenSecret: []byte("testingtestingtestingtestingtestingtestingtestingtestingtestingtesting"),
 	}
 	return a, nil
 }
 
 func (a Auth) AddMountPath(r *mux.Router) {
-	r.PathPrefix(a.MountPath).Handler(a.CreateAuthSubRouter())
+	sr := r.PathPrefix(a.MountPath).Subrouter()
+	a.CreateAuthSubRouter(sr)
 }
 
 func (a Auth) WrapXSRFRouter(r *mux.Router) http.Handler {
-	return alice.New(nosurfing, a.ab.ExpireMiddleware).Then(r)
+	return alice.New(nosurfing).Then(r)
 }
 
 func nosurfing(h http.Handler) http.Handler {
@@ -46,4 +49,24 @@ func nosurfing(h http.Handler) http.Handler {
 		w.WriteHeader(http.StatusBadRequest)
 	}))
 	return surfing
+}
+
+func (a Auth) DoAuth(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := a.GetCurrentUser(w, r)
+		if err != nil || user == "" {
+			log.Printf("%+v\n", err)
+			return
+		}
+		h(w, r)
+	}
+}
+
+func (a Auth) GetCurrentUser(w http.ResponseWriter, r *http.Request) (string, error) {
+	cookie, err := r.Cookie("JWT_TOKEN")
+	if err != nil {
+		return "", err
+	}
+	user, err := a.GetUserFromToken(cookie.Value)
+	return user, err
 }

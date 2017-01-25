@@ -19,7 +19,7 @@ func (a Auth) RegisterNewUser(username string, password string, email string) er
 	if err := row.Scan(); err != sql.ErrNoRows {
 		return ErrUserExists
 	}
-	row := a.db.QueryRow("SELECT email FROM users WHERE email=?", email)
+	row = a.db.QueryRow("SELECT email FROM users WHERE email=?", email)
 	if err := row.Scan(); err != sql.ErrNoRows {
 		return ErrEmailExists
 	}

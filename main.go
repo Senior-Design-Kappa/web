@@ -26,7 +26,7 @@ func makeAuth(conf config.Config) auth.Auth {
 	if err != nil {
 		log.Fatalf("error: auth layer could not be created (%+v)\n", err)
 	}
-	return a
+	return *a
 }
 
 func makeBackend(conf config.Config) backend.Backend {
