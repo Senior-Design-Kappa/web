@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/sessions"
 
-	"gopkg.in/authboss.v0"
+	"gopkg.in/authboss.v1"
 )
 
 var sessionStore *sessions.CookieStore

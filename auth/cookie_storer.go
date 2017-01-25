@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/securecookie"
 
-	"gopkg.in/authboss.v0"
+	"gopkg.in/authboss.v1"
 )
 
 var cookieStore *securecookie.SecureCookie

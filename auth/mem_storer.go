@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"gopkg.in/authboss.v0"
+	"gopkg.in/authboss.v1"
 )
 
 type MemStorer struct {

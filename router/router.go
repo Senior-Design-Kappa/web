@@ -25,7 +25,7 @@ var serverAuth *auth.Auth
 func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 	r := mux.NewRouter()
 	serverConf = &conf
-  serverAuth = &auth
+	serverAuth = &auth
 
 	// GET request handlers
 	gets := r.Methods("GET").Subrouter()
@@ -40,7 +40,7 @@ func NewServer(conf config.Config, logic logic.Logic, auth auth.Auth) *Server {
 
 	// Auth stuff
 	auth.AddMountPath(r)
-	stack := auth.CreateRouter(r)
+	stack := auth.WrapXSRFRouter(r)
 
 	s := &Server{
 		Server: &http.Server{
@@ -61,24 +61,24 @@ func health(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	data := map[string]string {
-    "Title": "Kappa",
-  }
-  RenderHeaderFooterTemplate(w, r, data, "templates/index.html")
+	data := map[string]string{
+		"Title": "Kappa",
+	}
+	RenderHeaderFooterTemplate(w, r, data, "templates/index.html")
 }
 
 func RoomHandler(w http.ResponseWriter, r *http.Request) {
-  roomId := mux.Vars(r)["id"]
-  _, err := strconv.Atoi(roomId)
-  if err != nil {
-    fmt.Fprintf(w, "Invalid room ID! (%s)", err)
-    return
-  }
+	roomId := mux.Vars(r)["id"]
+	_, err := strconv.Atoi(roomId)
+	if err != nil {
+		fmt.Fprintf(w, "Invalid room ID! (%s)", err)
+		return
+	}
 
-	data := map[string]string {
-    "WebsocketAddr": "ws://" + serverConf.SyncAddr + "/connect/",
-    "RoomId": roomId,
-    "Title": "Room " + roomId,
-  }
-  RenderHeaderFooterTemplate(w, r, data, "templates/room.html")
+	data := map[string]string{
+		"WebsocketAddr": "ws://" + serverConf.SyncAddr + "/connect/",
+		"RoomId":        roomId,
+		"Title":         "Room " + roomId,
+	}
+	RenderHeaderFooterTemplate(w, r, data, "templates/room.html")
 }

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"gopkg.in/authboss.v0"
+	"gopkg.in/authboss.v1"
 
 	_ "github.com/mattn/go-sqlite3"
 )
