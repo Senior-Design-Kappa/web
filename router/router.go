@@ -61,8 +61,14 @@ func health(w http.ResponseWriter, r *http.Request) {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	gets := r.URL.Query()
+	var showLogin = ""
+	if len(gets["showLogin"]) > 0 {
+		showLogin = "true"
+	}
 	data := map[string]string{
-		"Title": "Kappa",
+		"Title":     "Kappa",
+		"ShowLogin": showLogin,
 	}
 	RenderHeaderFooterTemplate(w, r, data, "templates/index.html")
 }

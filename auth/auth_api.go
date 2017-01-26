@@ -15,9 +15,11 @@ func (a Auth) CreateAuthSubRouter(r *mux.Router) {
 }
 
 func responseError(w http.ResponseWriter) {
-	fmt.Fprintf(w, "{error:true}")
+	w.WriteHeader(http.StatusInternalServerError)
+	fmt.Fprintf(w, "{'error':'true'}")
 }
 
+// TODO: set up email verification for register
 func (a Auth) registerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
 	if len(vars["username"]) != 1 || len(vars["password"]) != 1 || len(vars["email"]) != 1 {
@@ -39,7 +41,7 @@ func (a Auth) registerHandler(w http.ResponseWriter, r *http.Request) {
 		responseError(w)
 		return
 	}
-	fmt.Fprintf(w, "{ok:true}")
+	fmt.Fprintf(w, "{'ok':'true'}")
 }
 
 func (a Auth) loginHandler(w http.ResponseWriter, r *http.Request) {
