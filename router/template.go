@@ -17,6 +17,7 @@ func RenderHeaderFooterTemplate(w http.ResponseWriter, r *http.Request, data map
 	}
 	clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+"templates/header.html")
 	clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+"templates/footer.html")
+	clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+"templates/sidebar.html")
 	t := template.Must(template.ParseFiles(clientPathTemplates...))
 
 	user, err := serverAuth.GetCurrentUser(w, r)
