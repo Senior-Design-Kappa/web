@@ -19,6 +19,7 @@ type Server struct {
 	Config config.Config
 }
 
+
 var serverConf *config.Config
 var serverAuth *auth.Auth
 
@@ -66,10 +67,11 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if len(gets["showLogin"]) > 0 {
 		showLogin = "true"
 	}
-	data := map[string]string{
-		"Title":     "Kappa",
-		"ShowLogin": showLogin,
-	}
+
+  data := Data{
+    Title: "Kappa",
+    ShowLogin: showLogin,
+  }
 	RenderHeaderFooterTemplate(w, r, data, "templates/index.html")
 }
 
@@ -81,10 +83,10 @@ func RoomHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := map[string]string{
-		"WebsocketAddr": "ws://" + serverConf.SyncAddr + "/connect/",
-		"RoomId":        roomId,
-		"Title":         "Room " + roomId,
-	}
+  data := Data{
+  	WebsocketAddr: "ws://" + serverConf.SyncAddr + "/connect/",
+  	RoomId:        roomId,
+  	Title:         "Room " + roomId,
+  }
 	RenderHeaderFooterTemplate(w, r, data, "templates/room.html")
 }
