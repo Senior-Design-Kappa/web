@@ -19,7 +19,6 @@ type Server struct {
 	Config config.Config
 }
 
-
 var serverConf *config.Config
 var serverAuth *auth.Auth
 
@@ -68,25 +67,25 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		showLogin = "true"
 	}
 
-  data := Data{
-    Title: "Kappa",
-    ShowLogin: showLogin,
-  }
+	data := Data{
+		Title:     "Kappa",
+		ShowLogin: showLogin,
+	}
 	RenderHeaderFooterTemplate(w, r, data, "templates/index.html")
 }
 
 func RoomHandler(w http.ResponseWriter, r *http.Request) {
-	roomId := mux.Vars(r)["id"]
-	_, err := strconv.Atoi(roomId)
+	roomID := mux.Vars(r)["id"]
+	_, err := strconv.Atoi(roomID)
 	if err != nil {
 		fmt.Fprintf(w, "Invalid room ID! (%s)", err)
 		return
 	}
 
-  data := Data{
-  	WebsocketAddr: "ws://" + serverConf.SyncAddr + "/connect/",
-  	RoomId:        roomId,
-  	Title:         "Room " + roomId,
-  }
+	data := Data{
+		WebsocketAddr: "ws://" + serverConf.SyncAddr + "/connect/",
+		RoomID:        roomID,
+		Title:         "Room " + roomID,
+	}
 	RenderHeaderFooterTemplate(w, r, data, "templates/room.html")
 }
