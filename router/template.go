@@ -13,19 +13,25 @@ type Data struct {
   Username string
   Rooms []string
   Participants []string
+  VideoId string
 }
 // Prepends ClientPath + adds login information
-func RenderHeaderFooterTemplate(w http.ResponseWriter, r *http.Request, data Data, templates ...string) {
+func (s ServerConfig) RenderHeaderFooterTemplate(
+  w http.ResponseWriter,
+  r *http.Request,
+  data Data,
+  templates ...string,
+) {
 	var clientPathTemplates []string
 	for _, temp := range templates {
-		clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+temp)
+		clientPathTemplates = append(clientPathTemplates, s.config.ClientPath+temp)
 	}
-	clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+"templates/header.html")
-	clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+"templates/footer.html")
-	clientPathTemplates = append(clientPathTemplates, serverConf.ClientPath+"templates/sidebar.html")
+	clientPathTemplates = append(clientPathTemplates, s.config.ClientPath+"templates/header.html")
+	clientPathTemplates = append(clientPathTemplates, s.config.ClientPath+"templates/footer.html")
+	clientPathTemplates = append(clientPathTemplates, s.config.ClientPath+"templates/sidebar.html")
 	t := template.Must(template.ParseFiles(clientPathTemplates...))
 
-	user, err := serverAuth.GetCurrentUser(w, r)
+	user, err := s.auth.GetCurrentUser(w, r)
 	if err == nil && user != "" {
     data.Username = user
     data.Rooms = []string{"121", "240", "320", "520", "555", "677"}

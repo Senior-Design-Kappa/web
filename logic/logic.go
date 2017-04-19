@@ -6,6 +6,8 @@ import (
 )
 
 type Logic interface {
+  CreateRoom(ownerId int64, videoLink string) (int64, error)
+  GetVideoId(roomId int64) (string, error)
 }
 type logic struct {
 	backend backend.Backend
@@ -18,4 +20,12 @@ func NewLogic(conf config.Config, backend backend.Backend) (Logic, error) {
 		Config:  conf,
 	}
 	return l, nil
+}
+
+func (l logic) CreateRoom(ownerId int64, videoLink string) (int64, error) {
+  return l.backend.CreateRoom(ownerId, videoLink)
+}
+
+func (l logic) GetVideoId(roomId int64) (string, error) {
+  return l.backend.GetVideoId(roomId)
 }

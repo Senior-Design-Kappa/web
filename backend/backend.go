@@ -9,6 +9,8 @@ import (
 )
 
 type Backend interface {
+  CreateRoom(ownerId int64, videoId string) (int64, error)
+  GetVideoId(roomId int64) (string, error)
 }
 
 type backend struct {
@@ -26,4 +28,33 @@ func NewBackend(conf config.Config) (Backend, error) {
 		db:     db,
 	}
 	return b, nil
+}
+
+func (b backend) CreateRoom(ownerId int64, videoId string) (int64, error) {
+  stmt, err := b.db.Prepare("INSERT INTO rooms (owner_id, video_link) VALUES (?, ?)")
+  if err != nil {
+    return -1, err
+  }
+  res, err := stmt.Exec(ownerId, videoId)
+  if (err != nil) {
+    return -1, err
+  }
+  return res.LastInsertId()
+}
+
+func (b backend) GetVideoId(roomId int64) (string, error) {
+  // Sad Machine
+  defaultVideoId := "HAIDqt2aUek"
+
+  row := b.db.QueryRow("SELECT video_link FROM rooms WHERE id=?", roomId)
+  var videoId string
+  if err := row.Scan(&videoId); err != nil {
+    if err == sql.ErrNoRows {
+      return defaultVideoId, nil
+    } else {
+      log.Printf("%s\n", err)
+      return "", err
+    }
+  }
+  return videoId, nil
 }
